@@ -8,6 +8,7 @@ use crate::CsvZipError;
 // For Excel CSV
 const BYTE_ORDER_MARK: &[u8; 3] = b"\xEF\xBB\xBF";
 
+/// This is a csv file and csv format customizer.
 pub trait CsvCustomizer {
     fn customize(
         &self,

@@ -4,6 +4,7 @@ use csv::Writer;
 
 use crate::CsvZipError;
 
+/// This is a csv maker.
 pub struct CsvMaker {
     pub(crate) writer: Writer<BufWriter<File>>,
     pub(crate) file_name: String,

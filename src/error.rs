@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+/// This is a csv zip maker error.
 #[derive(Error, Debug)]
 pub enum CsvZipError {
     #[error("io error {0}")]
