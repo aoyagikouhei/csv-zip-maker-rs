@@ -1,5 +1,6 @@
 pub use csv_zip_maker::CsvZipMaker;
 pub use customize::CsvCustomizer;
+pub use customize::CsvExcelCustomizer;
 pub use error::CsvZipError;
 
 pub mod csv_maker;
@@ -11,7 +12,7 @@ pub use csv;
 
 #[cfg(test)]
 mod tests {
-    use crate::{customize::CsvExcelCustomizer, CsvZipError, CsvZipMaker};
+    use crate::{CsvExcelCustomizer, CsvZipError, CsvZipMaker};
 
     #[test]
     fn it_works() -> Result<(), CsvZipError> {

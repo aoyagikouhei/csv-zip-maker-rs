@@ -1,6 +1,6 @@
 # csv-zip-maker-rs
 
-Daemon Utilities by actix.
+CSV and ZIP maker
 
 [Documentation](https://docs.rs/actix-daemon-utils)
 
