@@ -8,7 +8,7 @@ use csv::WriterBuilder;
 use tempdir::TempDir;
 use zip::ZipWriter;
 
-use crate::{CsvZipError, CsvCustomizer, csv_maker::CsvMaker};
+use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvZipError};
 
 pub struct CsvZipMaker {
     tempdir: TempDir,

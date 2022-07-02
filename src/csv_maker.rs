@@ -1,4 +1,4 @@
-use std::{io::BufWriter, fs::File, path::PathBuf};
+use std::{fs::File, io::BufWriter, path::PathBuf};
 
 use csv::Writer;
 

@@ -1,4 +1,7 @@
-use std::{io::{BufWriter, Write}, fs::File};
+use std::{
+    fs::File,
+    io::{BufWriter, Write},
+};
 
 use crate::CsvZipError;
 
