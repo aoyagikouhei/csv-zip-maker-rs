@@ -2,7 +2,7 @@
 
 CSV and ZIP maker
 
-[Documentation](https://docs.rs/actix-daemon-utils)
+[Documentation](https://docs.rs/csv-zip-maker)
 
 ## Features
 - CSV and Zip file make in temp dir.
