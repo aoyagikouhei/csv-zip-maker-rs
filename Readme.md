@@ -11,6 +11,9 @@ CSV and ZIP maker
 
 ## Changes
 
+### v0.1.2 (2022/07/04)
+* fix Readme document path
+
 ### v0.1.1 (2022/07/02)
 * fix Readme
 * fix Cargo.toml categories
