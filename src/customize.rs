@@ -25,7 +25,7 @@ impl CsvCustomizer for CsvExcelCustomizer {
         buf_writer: &mut BufWriter<File>,
         writer_builder: &mut csv::WriterBuilder,
     ) -> Result<(), CsvZipError> {
-        buf_writer.write(BYTE_ORDER_MARK)?;
+        buf_writer.write_all(BYTE_ORDER_MARK)?;
         writer_builder.terminator(csv::Terminator::CRLF);
         Ok(())
     }
@@ -39,4 +39,4 @@ impl CsvCustomizer for () {
     ) -> Result<(), CsvZipError> {
         Ok(())
     }
-} 
+}

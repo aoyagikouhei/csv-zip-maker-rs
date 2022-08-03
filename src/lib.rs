@@ -1,4 +1,4 @@
-pub use csv_zip_maker::CsvZipMaker;
+pub use crate::csv_zip_maker::CsvZipMaker;
 pub use customize::CsvCustomizer;
 pub use customize::CsvExcelCustomizer;
 pub use error::CsvZipError;

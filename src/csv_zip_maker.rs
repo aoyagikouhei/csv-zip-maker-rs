@@ -8,7 +8,7 @@ use csv::WriterBuilder;
 use tempdir::TempDir;
 use zip::ZipWriter;
 
-use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvZipError, CsvExcelCustomizer};
+use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvExcelCustomizer, CsvZipError};
 
 pub struct CsvZipMaker {
     tempdir: TempDir,
@@ -29,17 +29,11 @@ impl CsvZipMaker {
         })
     }
 
-    pub fn make_csv_maker(
-        &self,
-        name: &str,
-    ) -> Result<CsvMaker, CsvZipError> {
+    pub fn make_csv_maker(&self, name: &str) -> Result<CsvMaker, CsvZipError> {
         self.make_csv_maker_with_customizer(name, ())
     }
 
-    pub fn make_csv_maker_for_excel(
-        &self,
-        name: &str,
-    ) -> Result<CsvMaker, CsvZipError> {
+    pub fn make_csv_maker_for_excel(&self, name: &str) -> Result<CsvMaker, CsvZipError> {
         self.make_csv_maker_with_customizer(name, CsvExcelCustomizer)
     }
 
@@ -73,7 +67,7 @@ impl CsvZipMaker {
             match f.read(&mut buf)? {
                 0 => break,
                 n => {
-                    self.writer.write(&buf[0..n])?;
+                    self.writer.write_all(&buf[0..n])?;
                 }
             }
         }

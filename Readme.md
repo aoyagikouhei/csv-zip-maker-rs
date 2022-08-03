@@ -11,6 +11,11 @@ CSV and ZIP maker
 
 ## Changes
 
+### v0.2.1 (2022/08/03)
+* modify Readme sample
+* change ambiguous error
+* change write to write_all
+
 ### v0.2.0 (2022/08/03)
 * hide customizer(breaking change)
 
@@ -30,11 +35,11 @@ use csv_zip_maker::{CsvExcelCustomizer, CsvZipError, CsvZipMaker};
 
 fn main() -> Result<(), CsvZipError> {
     let mut maker = CsvZipMaker::new("test", "summary")?;
-    let mut csv_maker = maker.make_csv_maker("summary1", Some(Box::new(CsvExcelCustomizer)))?;
+    let mut csv_maker = maker.make_csv_maker_for_excel("summary1")?;
     csv_maker.write(&vec!["aaa", "bbb"])?;
     csv_maker.write(&vec!["ccc", "ddd"])?;
     maker.add_csv(&mut csv_maker)?;
-    let mut csv_maker = maker.make_csv_maker("summary2", None)?;
+    let mut csv_maker = maker.make_csv_maker("summary2")?;
     csv_maker.write(&vec!["111", "222"])?;
     csv_maker.write(&vec!["333", "444"])?;
     maker.add_csv(&mut csv_maker)?;
