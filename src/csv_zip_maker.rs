@@ -8,7 +8,7 @@ use csv::WriterBuilder;
 use tempdir::TempDir;
 use zip::ZipWriter;
 
-use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvZipError};
+use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvZipError, CsvExcelCustomizer};
 
 pub struct CsvZipMaker {
     tempdir: TempDir,
@@ -32,16 +32,28 @@ impl CsvZipMaker {
     pub fn make_csv_maker(
         &self,
         name: &str,
-        customizer: Option<Box<dyn CsvCustomizer>>,
+    ) -> Result<CsvMaker, CsvZipError> {
+        self.make_csv_maker_with_customizer(name, ())
+    }
+
+    pub fn make_csv_maker_for_excel(
+        &self,
+        name: &str,
+    ) -> Result<CsvMaker, CsvZipError> {
+        self.make_csv_maker_with_customizer(name, CsvExcelCustomizer)
+    }
+
+    pub fn make_csv_maker_with_customizer(
+        &self,
+        name: &str,
+        customizer: impl CsvCustomizer,
     ) -> Result<CsvMaker, CsvZipError> {
         let file_name = format!("{}.csv", name);
         let file_path = self.tempdir.path().join(&file_name);
         let mut buf_writer = BufWriter::new(File::create(file_path.clone())?);
         let mut writer_builder = WriterBuilder::new();
 
-        if let Some(customizer) = customizer {
-            customizer.customize(&mut buf_writer, &mut writer_builder)?;
-        }
+        customizer.customize(&mut buf_writer, &mut writer_builder)?;
 
         Ok(CsvMaker {
             writer: writer_builder.from_writer(buf_writer),

@@ -30,3 +30,13 @@ impl CsvCustomizer for CsvExcelCustomizer {
         Ok(())
     }
 }
+
+impl CsvCustomizer for () {
+    fn customize(
+        &self,
+        _buf_writer: &mut BufWriter<File>,
+        _writer_builder: &mut csv::WriterBuilder,
+    ) -> Result<(), CsvZipError> {
+        Ok(())
+    }
+} 

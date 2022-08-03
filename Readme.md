@@ -11,6 +11,9 @@ CSV and ZIP maker
 
 ## Changes
 
+### v0.2.0 (2022/08/03)
+* hide customizer(breaking change)
+
 ### v0.1.2 (2022/07/04)
 * fix Readme document path
 
