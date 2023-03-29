@@ -19,8 +19,8 @@ pub struct CsvZipMaker {
 impl CsvZipMaker {
     pub fn new(prefix: &str, name: &str) -> Result<Self, CsvZipError> {
         let tempdir = TempDir::new(prefix)?;
-        let file_path = tempdir.path().join(&format!("{}.zip", name));
-        let buf_writer = BufWriter::new(File::create(file_path.clone())?);
+        let file_path = tempdir.path().join(format!("{}.zip", name));
+        let buf_writer = BufWriter::new(File::create(&file_path)?);
         let writer = ZipWriter::new(buf_writer);
         Ok(Self {
             tempdir,
@@ -44,7 +44,7 @@ impl CsvZipMaker {
     ) -> Result<CsvMaker, CsvZipError> {
         let file_name = format!("{}.csv", name);
         let file_path = self.tempdir.path().join(&file_name);
-        let mut buf_writer = BufWriter::new(File::create(file_path.clone())?);
+        let mut buf_writer = BufWriter::new(File::create(&file_path)?);
         let mut writer_builder = WriterBuilder::new();
 
         customizer.customize(&mut buf_writer, &mut writer_builder)?;
@@ -61,7 +61,7 @@ impl CsvZipMaker {
 
         self.writer
             .start_file(&csv_maker.file_name, Default::default())?;
-        let mut f = BufReader::new(File::open(csv_maker.file_path.clone())?);
+        let mut f = BufReader::new(File::open(&csv_maker.file_path)?);
         let mut buf = [0; 1024];
         loop {
             match f.read(&mut buf)? {
