@@ -11,6 +11,9 @@ CSV and ZIP maker
 
 ## Changes
 
+### v0.2.2 (2023/03/29)
+* change CsvMaker#write signature
+
 ### v0.2.1 (2022/08/03)
 * modify Readme sample
 * change ambiguous error
