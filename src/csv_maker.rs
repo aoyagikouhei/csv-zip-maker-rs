@@ -12,7 +12,11 @@ pub struct CsvMaker {
 }
 
 impl CsvMaker {
-    pub fn write(&mut self, line: &Vec<&str>) -> Result<(), CsvZipError> {
+    pub fn write<I>(&mut self, line: I) -> Result<(), CsvZipError>
+    where
+        I: IntoIterator,
+        I::Item: AsRef<[u8]>,
+    {
         self.writer.write_record(line).map_err(|e| e.into())
     }
 
