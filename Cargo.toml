@@ -15,4 +15,4 @@ documentation = "https://docs.rs/csz-zip-maker"
 csv = "1.1.6"
 tempfile = "3.10.0"
 thiserror = "1.0.31"
-zip = "0.6.2"
+zip = { version = "0.6.6", default-features = false, features = ["deflate"] }
