@@ -11,6 +11,9 @@ CSV and ZIP maker
 
 ## Changes
 
+### v0.2.3 (2024/02/21)
+* modify dependencies
+
 ### v0.2.2 (2023/03/29)
 * change CsvMaker#write signature
 
