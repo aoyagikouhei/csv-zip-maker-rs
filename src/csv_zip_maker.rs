@@ -5,7 +5,7 @@ use std::{
 };
 
 use csv::WriterBuilder;
-use tempdir::TempDir;
+use tempfile::TempDir;
 use zip::ZipWriter;
 
 use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvExcelCustomizer, CsvZipError};
@@ -18,7 +18,7 @@ pub struct CsvZipMaker {
 
 impl CsvZipMaker {
     pub fn new(prefix: &str, name: &str) -> Result<Self, CsvZipError> {
-        let tempdir = TempDir::new(prefix)?;
+        let tempdir = TempDir::with_prefix(prefix)?;
         let file_path = tempdir.path().join(format!("{}.zip", name));
         let buf_writer = BufWriter::new(File::create(&file_path)?);
         let writer = ZipWriter::new(buf_writer);

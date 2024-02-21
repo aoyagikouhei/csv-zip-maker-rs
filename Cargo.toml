@@ -13,6 +13,6 @@ documentation = "https://docs.rs/csz-zip-maker"
 
 [dependencies]
 csv = "1.1.6"
-tempdir = "0.3.7"
+tempfile = "3.10.0"
 thiserror = "1.0.31"
 zip = "0.6.2"
