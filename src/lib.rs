@@ -26,7 +26,8 @@ mod tests {
         csv_maker.write(&vec!["333", "444"])?;
         maker.add_csv(&mut csv_maker)?;
 
-        let mut csv_maker = maker.make_csv_maker_with_customizer("summary3", CsvExcelUtf16Customizer)?;
+        let mut csv_maker =
+            maker.make_csv_maker_with_customizer("summary3", CsvExcelUtf16Customizer)?;
         csv_maker.write(&vec!["予定表～①\n💖ﾊﾝｶｸだ", "予定表～②💖ﾊﾝｶｸだ"])?;
         csv_maker.write(&vec!["予定表～③💖ﾊﾝｶｸだ", "予定表～④💖ﾊﾝｶｸだ"])?;
         maker.add_csv_utf16(&mut csv_maker)?;

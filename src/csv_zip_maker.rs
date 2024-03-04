@@ -57,8 +57,7 @@ impl CsvZipMaker {
     }
 
     fn execute_csv(&mut self, file_name: &str, file_path: &PathBuf) -> Result<(), CsvZipError> {
-        self.writer
-            .start_file(file_name, Default::default())?;
+        self.writer.start_file(file_name, Default::default())?;
         let mut f = BufReader::new(File::open(file_path)?);
         let mut buf = [0; 1024];
         loop {
@@ -103,7 +102,8 @@ impl CsvZipMaker {
                                 Err(e) => return Err(CsvZipError::Utf16(e.to_string())),
                             };
                             buffer = Vec::new();
-                            let dst: Vec<u8> = src.encode_utf16().map(|it| it.to_le_bytes()).flatten().collect();
+                            let dst: Vec<u8> =
+                                src.encode_utf16().flat_map(|it| it.to_le_bytes()).collect();
                             writer.write_all(&dst)?;
                             cr_flag = false;
                         } else {
@@ -114,7 +114,7 @@ impl CsvZipMaker {
                     }
                 }
             }
-        };
+        }
         writer.flush()?;
 
         self.execute_csv(&csv_maker.file_name, &writer_file_path)
