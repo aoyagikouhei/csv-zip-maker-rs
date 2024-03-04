@@ -11,4 +11,7 @@ pub enum CsvZipError {
 
     #[error("zip error {0}")]
     Zip(#[from] zip::result::ZipError),
+
+    #[error("Utf16 {0}")]
+    Utf16(String),
 }

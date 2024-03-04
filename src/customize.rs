@@ -40,3 +40,18 @@ impl CsvCustomizer for () {
         Ok(())
     }
 }
+
+pub struct CsvExcelUtf16Customizer;
+
+impl CsvCustomizer for CsvExcelUtf16Customizer {
+    fn customize(
+        &self,
+        _buf_writer: &mut BufWriter<File>,
+        writer_builder: &mut csv::WriterBuilder,
+    ) -> Result<(), CsvZipError> {
+        writer_builder.terminator(csv::Terminator::CRLF);
+        writer_builder.delimiter(b'\t');
+        writer_builder.quote_style(csv::QuoteStyle::Always);
+        Ok(())
+    }
+}

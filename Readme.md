@@ -10,30 +10,7 @@ CSV and ZIP maker
 - Use file instead of memory.
 
 ## Changes
-
-### v0.2.3 (2024/02/21)
-* modify dependencies
-
-### v0.2.2 (2023/03/29)
-* change CsvMaker#write signature
-
-### v0.2.1 (2022/08/03)
-* modify Readme sample
-* change ambiguous error
-* change write to write_all
-
-### v0.2.0 (2022/08/03)
-* hide customizer(breaking change)
-
-### v0.1.2 (2022/07/04)
-* fix Readme document path
-
-### v0.1.1 (2022/07/02)
-* fix Readme
-* fix Cargo.toml categories
-
-### v0.1.0 (2022/07/02)
-* first release
+[CHANGELOG.md](https://github.com/aoyagikouhei/csv-zip-maker-rs/blob/main/CHANGELOG.md)
 
 ## Examples
 ```rust
@@ -49,6 +26,13 @@ fn main() -> Result<(), CsvZipError> {
     csv_maker.write(&vec!["111", "222"])?;
     csv_maker.write(&vec!["333", "444"])?;
     maker.add_csv(&mut csv_maker)?;
+
+    // UTF16
+    let mut csv_maker = maker.make_csv_maker_with_customizer("summary3", CsvUtf16Customizer)?;
+    csv_maker.write(&vec!["予定表～①\n💖ﾊﾝｶｸだ", "予定表～②💖ﾊﾝｶｸだ"])?;
+    csv_maker.write(&vec!["予定表～③💖ﾊﾝｶｸだ", "予定表～④💖ﾊﾝｶｸだ"])?;
+    
+    maker.add_csv_utf16(&mut csv_maker)?;
 
     let path_buf = maker.make_zip_file()?;
     std::fs::copy(path_buf, "test.zip")?;

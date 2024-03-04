@@ -56,12 +56,10 @@ impl CsvZipMaker {
         })
     }
 
-    pub fn add_csv(&mut self, csv_maker: &mut CsvMaker) -> Result<(), CsvZipError> {
-        csv_maker.flush()?;
-
+    fn execute_csv(&mut self, file_name: &str, file_path: &PathBuf) -> Result<(), CsvZipError> {
         self.writer
-            .start_file(&csv_maker.file_name, Default::default())?;
-        let mut f = BufReader::new(File::open(&csv_maker.file_path)?);
+            .start_file(file_name, Default::default())?;
+        let mut f = BufReader::new(File::open(file_path)?);
         let mut buf = [0; 1024];
         loop {
             match f.read(&mut buf)? {
@@ -72,6 +70,54 @@ impl CsvZipMaker {
             }
         }
         Ok(())
+    }
+
+    pub fn add_csv(&mut self, csv_maker: &mut CsvMaker) -> Result<(), CsvZipError> {
+        csv_maker.flush()?;
+        self.execute_csv(&csv_maker.file_name, &csv_maker.file_path)
+    }
+
+    pub fn add_csv_utf16(&mut self, csv_maker: &mut CsvMaker) -> Result<(), CsvZipError> {
+        csv_maker.flush()?;
+        let reader_file_path = match csv_maker.file_path.to_str() {
+            Some(res) => res,
+            None => return Err(CsvZipError::Utf16("file_path.to_str".to_owned())),
+        };
+        let writer_file_path = self.tempdir.path().join("utf16.csv");
+        let mut reader = BufReader::new(File::open(reader_file_path)?);
+        let mut writer = BufWriter::new(File::create(writer_file_path.clone())?);
+        writer.write_all(b"\xFF\xFE")?;
+        let mut buf = [0; 1];
+        let mut buffer: Vec<u8> = Vec::new();
+        let mut cr_flag = false;
+        loop {
+            match reader.read(&mut buf)? {
+                0 => break,
+                _n => {
+                    buffer.push(buf[0]);
+                    if cr_flag {
+                        if buf[0] == b'\n' {
+                            // 完了
+                            let src = match String::from_utf8(buffer) {
+                                Ok(res) => res,
+                                Err(e) => return Err(CsvZipError::Utf16(e.to_string())),
+                            };
+                            buffer = Vec::new();
+                            let dst: Vec<u8> = src.encode_utf16().map(|it| it.to_le_bytes()).flatten().collect();
+                            writer.write_all(&dst)?;
+                            cr_flag = false;
+                        } else {
+                            cr_flag = false;
+                        }
+                    } else if buf[0] == b'\r' {
+                        cr_flag = true;
+                    }
+                }
+            }
+        };
+        writer.flush()?;
+
+        self.execute_csv(&csv_maker.file_name, &writer_file_path)
     }
 
     pub fn make_zip_file(&mut self) -> Result<&PathBuf, CsvZipError> {
