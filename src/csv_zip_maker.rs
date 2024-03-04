@@ -96,7 +96,7 @@ impl CsvZipMaker {
                     buffer.push(buf[0]);
                     if cr_flag {
                         if buf[0] == b'\n' {
-                            // 完了
+                            // CRLFが完成した
                             let src = match String::from_utf8(buffer) {
                                 Ok(res) => res,
                                 Err(e) => return Err(CsvZipError::Utf16(e.to_string())),
@@ -106,10 +106,14 @@ impl CsvZipMaker {
                                 src.encode_utf16().flat_map(|it| it.to_le_bytes()).collect();
                             writer.write_all(&dst)?;
                             cr_flag = false;
+                        } else if buf[0] == b'\r' {
+                            // 連続でCRがきた場合はcr_flagは立てたまま
                         } else {
+                            // CRの次にCRまたはLFが来ていない場合はCRフラグを落とす
                             cr_flag = false;
                         }
                     } else if buf[0] == b'\r' {
+                        // CRが来たのでフラグを立てる
                         cr_flag = true;
                     }
                 }

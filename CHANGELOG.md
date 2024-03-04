@@ -1,5 +1,8 @@
 # Changelogs
 
+## v0.3.1 (2024/03/04)
+* modify CRCRLF pattern
+
 ## v0.3.0 (2024/03/04)
 * add UTF16-le
 

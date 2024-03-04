@@ -64,7 +64,7 @@ dependencies = [
 
 [[package]]
 name = "csv-zip-maker"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "csv",
  "tempfile",
