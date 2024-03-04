@@ -100,6 +100,8 @@ impl CsvZipMaker {
 }
 
 const BYTE_ORDER_MARK: [u8; 2] = [0xFF, 0xFE];
+const CR: u8 = b'\r';
+const LF: u8 = b'\n';
 
 fn convert_file<P>(src: P, dst: P) -> Result<(), CsvZipError>
 where
@@ -121,18 +123,18 @@ where
             _n => {
                 buffer.push(buf[0]);
                 if cr_flag {
-                    if buf[0] == b'\n' {
+                    if buf[0] == LF {
                         // CRLFが完成した
                         writer.write_all(&make_bytes(buffer)?)?;
                         buffer = Vec::new();
                         cr_flag = false;
-                    } else if buf[0] == b'\r' {
+                    } else if buf[0] == CR {
                         // 連続でCRがきた場合はcr_flagは立てたまま
                     } else {
                         // CRの次にCRまたはLFが来ていない場合はCRフラグを落とす
                         cr_flag = false;
                     }
-                } else if buf[0] == b'\r' {
+                } else if buf[0] == CR {
                     // CRが来たのでフラグを立てる
                     cr_flag = true;
                 }
