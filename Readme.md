@@ -14,7 +14,7 @@ CSV and ZIP maker
 
 ## Examples
 ```rust
-use csv_zip_maker::{CsvExcelCustomizer, CsvZipError, CsvZipMaker};
+use csv_zip_maker::{customize::CsvExcelUtf16Customizer, CsvExcelCustomizer, CsvZipError, CsvZipMaker};
 
 fn main() -> Result<(), CsvZipError> {
     let mut maker = CsvZipMaker::new("test", "summary")?;
@@ -28,7 +28,7 @@ fn main() -> Result<(), CsvZipError> {
     maker.add_csv(&mut csv_maker)?;
 
     // UTF16
-    let mut csv_maker = maker.make_csv_maker_with_customizer("summary3", CsvUtf16Customizer)?;
+    let mut csv_maker = maker.make_csv_maker_with_customizer("summary3", CsvExcelUtf16Customizer)?;
     csv_maker.write(&vec!["予定表～①\n💖ﾊﾝｶｸだ", "予定表～②💖ﾊﾝｶｸだ"])?;
     csv_maker.write(&vec!["予定表～③💖ﾊﾝｶｸだ", "予定表～④💖ﾊﾝｶｸだ"])?;
     

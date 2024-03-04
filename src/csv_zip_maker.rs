@@ -1,7 +1,7 @@
 use std::{
     fs::File,
     io::{BufReader, BufWriter, Read, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use csv::WriterBuilder;
@@ -78,49 +78,8 @@ impl CsvZipMaker {
 
     pub fn add_csv_utf16(&mut self, csv_maker: &mut CsvMaker) -> Result<(), CsvZipError> {
         csv_maker.flush()?;
-        let reader_file_path = match csv_maker.file_path.to_str() {
-            Some(res) => res,
-            None => return Err(CsvZipError::Utf16("file_path.to_str".to_owned())),
-        };
         let writer_file_path = self.tempdir.path().join("utf16.csv");
-        let mut reader = BufReader::new(File::open(reader_file_path)?);
-        let mut writer = BufWriter::new(File::create(writer_file_path.clone())?);
-        writer.write_all(b"\xFF\xFE")?;
-        let mut buf = [0; 1];
-        let mut buffer: Vec<u8> = Vec::new();
-        let mut cr_flag = false;
-        loop {
-            match reader.read(&mut buf)? {
-                0 => break,
-                _n => {
-                    buffer.push(buf[0]);
-                    if cr_flag {
-                        if buf[0] == b'\n' {
-                            // CRLFが完成した
-                            let src = match String::from_utf8(buffer) {
-                                Ok(res) => res,
-                                Err(e) => return Err(CsvZipError::Utf16(e.to_string())),
-                            };
-                            buffer = Vec::new();
-                            let dst: Vec<u8> =
-                                src.encode_utf16().flat_map(|it| it.to_le_bytes()).collect();
-                            writer.write_all(&dst)?;
-                            cr_flag = false;
-                        } else if buf[0] == b'\r' {
-                            // 連続でCRがきた場合はcr_flagは立てたまま
-                        } else {
-                            // CRの次にCRまたはLFが来ていない場合はCRフラグを落とす
-                            cr_flag = false;
-                        }
-                    } else if buf[0] == b'\r' {
-                        // CRが来たのでフラグを立てる
-                        cr_flag = true;
-                    }
-                }
-            }
-        }
-        writer.flush()?;
-
+        convert_file(&csv_maker.file_path, &writer_file_path)?;
         self.execute_csv(&csv_maker.file_name, &writer_file_path)
     }
 
@@ -138,4 +97,56 @@ impl CsvZipMaker {
         let _ = file.read_to_end(&mut buf)?;
         Ok(buf)
     }
+}
+
+const BYTE_ORDER_MARK: [u8; 2] = [0xFF, 0xFE];
+
+fn convert_file<P>(src: P, dst: P) -> Result<(), CsvZipError>
+where
+    P: AsRef<Path>,
+{
+    let mut reader = BufReader::new(File::open(src)?);
+    let mut writer = BufWriter::new(File::create(dst)?);
+
+    // BOMを書き込む
+    writer.write_all(&BYTE_ORDER_MARK)?;
+
+    // 1byteごとに取得
+    let mut buf = [0; 1];
+    let mut buffer: Vec<u8> = Vec::new();
+    let mut cr_flag = false;
+    loop {
+        match reader.read(&mut buf)? {
+            0 => break, // 行の最後はCRLFでおわるはず。
+            _n => {
+                buffer.push(buf[0]);
+                if cr_flag {
+                    if buf[0] == b'\n' {
+                        // CRLFが完成した
+                        writer.write_all(&make_bytes(buffer)?)?;
+                        buffer = Vec::new();
+                        cr_flag = false;
+                    } else if buf[0] == b'\r' {
+                        // 連続でCRがきた場合はcr_flagは立てたまま
+                    } else {
+                        // CRの次にCRまたはLFが来ていない場合はCRフラグを落とす
+                        cr_flag = false;
+                    }
+                } else if buf[0] == b'\r' {
+                    // CRが来たのでフラグを立てる
+                    cr_flag = true;
+                }
+            }
+        }
+    }
+    writer.flush().map_err(|e| e.into())
+}
+
+fn make_bytes(src: Vec<u8>) -> Result<Vec<u8>, CsvZipError> {
+    let src = match String::from_utf8(src) {
+        Ok(res) => res,
+        Err(e) => return Err(CsvZipError::Utf16(e.to_string())),
+    };
+    let dst: Vec<u8> = src.encode_utf16().flat_map(|it| it.to_le_bytes()).collect();
+    Ok(dst)
 }
