@@ -6,7 +6,7 @@ use std::{
 
 use csv::WriterBuilder;
 use tempfile::TempDir;
-use zip::ZipWriter;
+use zip::{write::FileOptions, ZipWriter};
 
 use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvExcelCustomizer, CsvZipError};
 
@@ -14,10 +14,19 @@ pub struct CsvZipMaker {
     tempdir: TempDir,
     writer: ZipWriter<BufWriter<File>>,
     file_path: PathBuf,
+    file_options: FileOptions,
 }
 
 impl CsvZipMaker {
     pub fn new(prefix: &str, name: &str) -> Result<Self, CsvZipError> {
+        Self::new_with_file_option(prefix, name, FileOptions::default())
+    }
+
+    pub fn new_with_file_option(
+        prefix: &str,
+        name: &str,
+        file_options: FileOptions,
+    ) -> Result<Self, CsvZipError> {
         let tempdir = TempDir::with_prefix(prefix)?;
         let file_path = tempdir.path().join(format!("{}.zip", name));
         let buf_writer = BufWriter::new(File::create(&file_path)?);
@@ -26,6 +35,7 @@ impl CsvZipMaker {
             tempdir,
             writer,
             file_path,
+            file_options,
         })
     }
 
@@ -57,7 +67,7 @@ impl CsvZipMaker {
     }
 
     fn execute_csv(&mut self, file_name: &str, file_path: &PathBuf) -> Result<(), CsvZipError> {
-        self.writer.start_file(file_name, Default::default())?;
+        self.writer.start_file(file_name, self.file_options)?;
         let mut f = BufReader::new(File::open(file_path)?);
         let mut buf = [0; 1024];
         loop {
