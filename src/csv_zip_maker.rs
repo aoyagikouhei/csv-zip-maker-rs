@@ -6,8 +6,7 @@ use std::{
 
 use csv::WriterBuilder;
 use tempfile::TempDir;
-use time::OffsetDateTime;
-use zip::{write::FileOptions, DateTime, ZipWriter};
+use zip::{write::FileOptions, ZipWriter};
 
 use crate::{csv_maker::CsvMaker, CsvCustomizer, CsvExcelCustomizer, CsvZipError};
 
@@ -19,20 +18,19 @@ pub struct CsvZipMaker {
 }
 
 impl CsvZipMaker {
-    pub fn new(
+    pub fn new(prefix: &str, name: &str) -> Result<Self, CsvZipError> {
+        Self::new_with_file_option(prefix, name, FileOptions::default())
+    }
+
+    pub fn new_with_file_option(
         prefix: &str,
         name: &str,
-        file_timestamp: Option<OffsetDateTime>,
+        file_options: FileOptions,
     ) -> Result<Self, CsvZipError> {
         let tempdir = TempDir::with_prefix(prefix)?;
         let file_path = tempdir.path().join(format!("{}.zip", name));
         let buf_writer = BufWriter::new(File::create(&file_path)?);
         let writer = ZipWriter::new(buf_writer);
-        let file_options = if let Some(offset) = file_timestamp {
-            FileOptions::default().last_modified_time(DateTime::try_from(offset).unwrap())
-        } else {
-            FileOptions::default()
-        };
         Ok(Self {
             tempdir,
             writer,

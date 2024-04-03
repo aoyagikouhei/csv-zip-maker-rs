@@ -8,15 +8,18 @@ pub mod csv_zip_maker;
 pub mod customize;
 pub mod error;
 pub use csv;
+pub use time;
+pub use zip;
 
 #[cfg(test)]
 mod tests {
     use crate::{customize::CsvExcelUtf16Customizer, CsvZipError, CsvZipMaker};
     use time::{Duration, OffsetDateTime};
+    use zip::{write::FileOptions, DateTime};
 
     #[test]
     fn it_works() -> Result<(), CsvZipError> {
-        let mut maker = CsvZipMaker::new("test", "summary", None)?;
+        let mut maker = CsvZipMaker::new("test", "summary")?;
         let mut csv_maker = maker.make_csv_maker_for_excel("summary1")?;
         csv_maker.write(&vec!["aaa", "bbb"])?;
         csv_maker.write(&vec!["ccc", "ddd"])?;
@@ -44,7 +47,8 @@ mod tests {
     #[test]
     fn it_works_with_timestamp_offset() -> Result<(), CsvZipError> {
         let offset = OffsetDateTime::now_utc() + Duration::hours(9);
-        let mut maker = CsvZipMaker::new("test", "summary", Some(offset))?;
+        let option = FileOptions::default().last_modified_time(DateTime::try_from(offset).unwrap());
+        let mut maker = CsvZipMaker::new_with_file_option("test", "summary", option)?;
         let mut csv_maker = maker.make_csv_maker_for_excel("summary1")?;
         csv_maker.write(&vec!["aaa", "bbb"])?;
         csv_maker.write(&vec!["ccc", "ddd"])?;
