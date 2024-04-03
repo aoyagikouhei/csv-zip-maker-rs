@@ -1,5 +1,8 @@
 # Changelogs
 
+## v0.4.0 (2024/04/03)
+* Add zip writer options
+
 ## v0.3.1 (2024/03/04)
 * modify CRCRLF pattern
 
