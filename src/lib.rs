@@ -12,10 +12,11 @@ pub use csv;
 #[cfg(test)]
 mod tests {
     use crate::{customize::CsvExcelUtf16Customizer, CsvZipError, CsvZipMaker};
+    use time::{Duration, OffsetDateTime};
 
     #[test]
     fn it_works() -> Result<(), CsvZipError> {
-        let mut maker = CsvZipMaker::new("test", "summary")?;
+        let mut maker = CsvZipMaker::new("test", "summary", None)?;
         let mut csv_maker = maker.make_csv_maker_for_excel("summary1")?;
         csv_maker.write(&vec!["aaa", "bbb"])?;
         csv_maker.write(&vec!["ccc", "ddd"])?;
@@ -34,6 +35,34 @@ mod tests {
 
         let path_buf = maker.make_zip_file()?;
         std::fs::copy(path_buf, "test.zip")?;
+
+        //assert_eq!(263, maker.make_zip_binary()?.len());
+
+        Ok(())
+    }
+
+    #[test]
+    fn it_works_with_timestamp_offset() -> Result<(), CsvZipError> {
+        let offset = OffsetDateTime::now_utc() + Duration::hours(9);
+        let mut maker = CsvZipMaker::new("test", "summary", Some(offset))?;
+        let mut csv_maker = maker.make_csv_maker_for_excel("summary1")?;
+        csv_maker.write(&vec!["aaa", "bbb"])?;
+        csv_maker.write(&vec!["ccc", "ddd"])?;
+        maker.add_csv(&mut csv_maker)?;
+
+        let mut csv_maker = maker.make_csv_maker("summary2")?;
+        csv_maker.write(&vec!["111", "222"])?;
+        csv_maker.write(&vec!["333", "444"])?;
+        maker.add_csv(&mut csv_maker)?;
+
+        let mut csv_maker =
+            maker.make_csv_maker_with_customizer("summary3", CsvExcelUtf16Customizer)?;
+        csv_maker.write(&vec!["予定表～①\n💖ﾊﾝｶｸだ", "予定表～②💖ﾊﾝｶｸだ"])?;
+        csv_maker.write(&vec!["予定表～③💖ﾊﾝｶｸだ", "予定表～④💖ﾊﾝｶｸだ"])?;
+        maker.add_csv_utf16(&mut csv_maker)?;
+
+        let path_buf = maker.make_zip_file()?;
+        std::fs::copy(path_buf, "test_with_offset.zip")?;
 
         //assert_eq!(263, maker.make_zip_binary()?.len());
 
